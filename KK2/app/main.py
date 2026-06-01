@@ -1,16 +1,14 @@
-from typing import Any
-
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
 from app.data import DatasetError, get_stats, load_csv
-from app.schemas import ErrorResponse, UploadMetadata
+from app.schemas import ErrorResponse, HealthResponse, StatsResponse, UploadMetadata
 
 app = FastAPI(title="KK2 Oraklet")
 
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+@app.get("/health", response_model=HealthResponse)
+def health() -> HealthResponse:
+    return HealthResponse(status="ok")
 
 
 @app.post(
@@ -30,11 +28,12 @@ async def upload_data(file: UploadFile = File(...)) -> UploadMetadata:
 
 @app.get(
     "/data/stats",
+    response_model=StatsResponse,
     responses={404: {"model": ErrorResponse}},
 )
-def data_stats() -> dict[str, dict[str, Any]]:
+def data_stats() -> StatsResponse:
     stats = get_stats()
     if stats is None:
         raise HTTPException(status_code=404, detail="No dataset has been uploaded.")
 
-    return stats
+    return StatsResponse(stats)

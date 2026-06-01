@@ -1,12 +1,20 @@
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
+
+
+class HealthResponse(BaseModel):
+    status: str
 
 
 class UploadMetadata(BaseModel):
     rows: int = Field(ge=0)
     columns: list[str]
     dtypes: dict[str, str]
+
+
+class StatsResponse(RootModel[dict[str, dict[str, Any]]]):
+    pass
 
 
 class AskRequest(BaseModel):

@@ -12,21 +12,21 @@ Writing on the train so I might miss something will refine stuff when home
 - keep `.env.example` because that one is ok -done
 - check gitignore ignores the example assignment + extra rules stuff -done
 
-## start the api
+## start the api -done
 
-- make `app/main.py`
-- create the FastAPI app there
-- add `/health` just so I know it runs
-- run:
+- done: `app/main.py` already exists
+- done: FastAPI app is created there
+- done: `/health` exists and returns ok
+- ran: 
 
 ```bash
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload 
 ```
 
-- open `http://127.0.0.1:8000/docs`
-- if Swagger works then move tf on
+- open `http://127.0.0.1:8000/docs` 
+- if Swagger works then move tf on 
 
-## schemas probably needed
+## schemas probably needed -done
 
 Put these in `app/schemas.py`.
 
