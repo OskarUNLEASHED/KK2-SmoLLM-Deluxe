@@ -79,5 +79,5 @@ def test_ask_uses_chain_with_mocked_llm(monkeypatch: pytest.MonkeyPatch) -> None
     assert response.json() == {
         "question": "Which city is warmest?",
         "answer": "Malmo has the highest temperature.",
-        "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+        "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
     }

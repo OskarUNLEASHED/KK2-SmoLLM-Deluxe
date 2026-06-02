@@ -13,15 +13,34 @@ def test_prompt_builder_includes_question_and_stats() -> None:
 
     assert "Which city is warmest?" in prompt.prompt
     assert "temp_c" in prompt.prompt
-    assert "mean=8.3" in prompt.prompt
-    assert "Svar:" in prompt.prompt
+    assert "mean=8.30" in prompt.prompt
+    assert "ANSWER:" in prompt.prompt
+    assert "average = mean" in prompt.prompt
 
 
-def test_fake_llm_runner_returns_raw_text() -> None:
-    output = LLMRunner().invoke(PromptBuilderOutput(prompt="Prompt text\nSvar:"))
+def test_llm_runner_returns_raw_text_from_generator() -> None:
+    def fake_generator(*args: object, **kwargs: object) -> list[dict[str, str]]:
+        return [{"generated_text": "Generated answer"}]
 
-    assert "testsvar" in output.raw_text
-    assert "Prompt text" in output.raw_text
+    output = LLMRunner(generator=fake_generator).invoke(
+        PromptBuilderOutput(prompt="Prompt text\nSvar:")
+    )
+
+    assert output.raw_text == "Generated answer"
+
+
+def test_llm_runner_rejects_empty_model_output() -> None:
+    def fake_generator(*args: object, **kwargs: object) -> list[dict[str, str]]:
+        return [{"generated_text": ""}]
+
+    runner = LLMRunner(generator=fake_generator)
+
+    try:
+        runner.invoke(PromptBuilderOutput(prompt="Prompt text\nSvar:"))
+    except ValueError as exc:
+        assert str(exc) == "The model returned an empty answer."
+    else:
+        raise AssertionError("Expected ValueError for empty model output.")
 
 
 def test_response_parser_strips_prompt_echo() -> None:
@@ -32,8 +51,22 @@ def test_response_parser_strips_prompt_echo() -> None:
     assert parsed.answer == "Malmö has the highest mean."
 
 
+def test_response_parser_rejects_repetitive_answer() -> None:
+    runner_output = LLMRunnerOutput(raw_text="Svar:\nSvergar Svergar Svergar Svergar Svergar Svergar Svergar Svergar")
+
+    try:
+        ResponseParser().invoke(runner_output)
+    except ValueError as exc:
+        assert str(exc) == "The model returned a repetitive answer."
+    else:
+        raise AssertionError("Expected ValueError for repetitive model output.")
+
+
 def test_full_chain_uses_pipe_operator() -> None:
-    chain = build_oraklet_chain()
+    def fake_generator(*args: object, **kwargs: object) -> list[dict[str, str]]:
+        return [{"generated_text": "Chain answer"}]
+
+    chain = build_oraklet_chain(LLMRunner(generator=fake_generator))
 
     result = chain.invoke(
         PromptBuilderInput(
@@ -43,4 +76,4 @@ def test_full_chain_uses_pipe_operator() -> None:
     )
 
     assert result.answer
-    assert "testsvar" in result.answer
+    assert result.answer == "Chain answer"

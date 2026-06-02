@@ -1,6 +1,7 @@
 # Project-specific
 /Example KK2 Assignment/
 /Assignment Information/Extra Rules/
+/Assignment Information/*.csv
 
 # Local environment files
 .env

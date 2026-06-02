@@ -65,7 +65,7 @@ def ask_oraklet(request: AskRequest) -> AskResponse:
         result = oraklet.invoke(
             PromptBuilderInput(question=request.question, stats=stats)
         )
-    except ValueError as exc:
+    except (RuntimeError, ValueError) as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
     return AskResponse(
