@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
+from app.chain.direct_stats import answer_direct_stats_question
 from app.chain.pipeline import MODEL_NAME, oraklet
 from app.data import DatasetError, get_stats, load_csv
 from app.schemas import (
@@ -60,6 +61,14 @@ def ask_oraklet(request: AskRequest) -> AskResponse:
     stats = get_stats()
     if stats is None:
         raise HTTPException(status_code=400, detail="Upload a dataset before asking questions.")
+
+    direct_answer = answer_direct_stats_question(request.question, stats)
+    if direct_answer is not None:
+        return AskResponse(
+            question=request.question,
+            answer=direct_answer,
+            model=MODEL_NAME,
+        )
 
     try:
         result = oraklet.invoke(

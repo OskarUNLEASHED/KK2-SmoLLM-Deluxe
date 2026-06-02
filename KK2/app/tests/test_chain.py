@@ -1,3 +1,4 @@
+from app.chain.direct_stats import answer_direct_stats_question
 from app.chain.pipeline import build_oraklet_chain
 from app.chain.steps import LLMRunner, PromptBuilder, ResponseParser
 from app.schemas import LLMRunnerOutput, PromptBuilderInput, PromptBuilderOutput
@@ -20,6 +21,7 @@ def test_prompt_builder_includes_question_and_stats() -> None:
 
 def test_llm_runner_returns_raw_text_from_generator() -> None:
     def fake_generator(*args: object, **kwargs: object) -> list[dict[str, str]]:
+        assert kwargs["return_full_text"] is False
         return [{"generated_text": "Generated answer"}]
 
     output = LLMRunner(generator=fake_generator).invoke(
@@ -77,3 +79,39 @@ def test_full_chain_uses_pipe_operator() -> None:
 
     assert result.answer
     assert result.answer == "Chain answer"
+
+
+def test_direct_stats_answer_handles_highest_named_column() -> None:
+    answer = answer_direct_stats_question(
+        "What is the highest Sales value?",
+        {"Sales": {"count": 3.0, "mean": 20.0, "min": 10.0, "max": 42.5}},
+    )
+
+    assert answer == "Sales max is 42.50."
+
+
+def test_direct_stats_answer_handles_singular_question_for_plural_column() -> None:
+    answer = answer_direct_stats_question(
+        "What is the highest sale value?",
+        {"Sales": {"count": 3.0, "mean": 20.0, "min": 10.0, "max": 42.5}},
+    )
+
+    assert answer == "Sales max is 42.50."
+
+
+def test_direct_stats_answer_ignores_questions_without_metric() -> None:
+    answer = answer_direct_stats_question(
+        "Which city is warmest?",
+        {"city": {"top": "Malmo", "freq": 1}, "temp_c": {"max": 12.0}},
+    )
+
+    assert answer is None
+
+
+def test_direct_stats_answer_ignores_row_lookup_questions() -> None:
+    answer = answer_direct_stats_question(
+        "Which Region has the highest Sales value?",
+        {"Region": {"top": "South", "freq": 1}, "Sales": {"max": 42.5}},
+    )
+
+    assert answer is None

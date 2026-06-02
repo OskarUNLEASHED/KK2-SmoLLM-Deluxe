@@ -81,3 +81,19 @@ def test_ask_uses_chain_with_mocked_llm(monkeypatch: pytest.MonkeyPatch) -> None
         "answer": "Malmo has the highest temperature.",
         "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
     }
+
+
+def test_ask_answers_direct_stats_question_without_llm() -> None:
+    client.post(
+        "/data/upload",
+        files={"file": ("sales.csv", b"Sales,Region\n10,North\n42.5,South\n")},
+    )
+
+    response = client.post("/ai/ask", json={"question": "What is the highest sale value?"})
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "question": "What is the highest sale value?",
+        "answer": "Sales max is 42.50.",
+        "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    }

@@ -104,6 +104,7 @@ class LLMRunner(Runnable[PromptBuilderOutput, LLMRunnerOutput]):
                 repetition_penalty=settings.repetition_penalty,
                 no_repeat_ngram_size=settings.no_repeat_ngram_size,
                 clean_up_tokenization_spaces=False,
+                return_full_text=False,
             )
         except Exception as exc:
             raise RuntimeError("SmolLM could not generate an answer.") from exc
