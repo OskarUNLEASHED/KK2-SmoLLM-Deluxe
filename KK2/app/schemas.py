@@ -36,20 +36,20 @@ class PromptBuilderInput(BaseModel):
     stats: dict[str, dict[str, Any]]
 
 
-class PromptBuilderOutput(BaseModel):
-    prompt: str = Field(min_length=1)
-
-
 class LLMRunnerInput(BaseModel):
     prompt: str = Field(min_length=1)
 
 
-class LLMRunnerOutput(BaseModel):
-    raw_text: str
+class PromptBuilderOutput(LLMRunnerInput):
+    pass
 
 
 class ResponseParserInput(BaseModel):
     raw_text: str
+
+
+class LLMRunnerOutput(ResponseParserInput):
+    pass
 
 
 class ResponseParserOutput(BaseModel):

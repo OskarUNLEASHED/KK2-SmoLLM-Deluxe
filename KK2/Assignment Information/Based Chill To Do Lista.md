@@ -121,6 +121,32 @@ Do these while LLM is still fake/mocked:
 
 This should save time later.
 
+## extra test chilling maybe
+
+Potential tests for fun tests to implement
+
+- automated api tests with `TestClient`
+- unit tests for the small chain parts
+- integration test for upload csv -> ask question
+- regression tests for bugs I fix later
+- smoke test for `/health`
+- empty csv upload
+- broken csv upload
+- weird column names in csv
+- csv with only one row
+- very short question to `/ai/ask`
+- too long question to `/ai/ask`
+- `/ai/ask` with mocked model output
+- model returns empty text
+- model crashes and api returns useful error
+- parser removes prompt junk from model answer
+- stats after uploading new csv replaces old dataset
+- check response json has the expected fields, not only status code
+- maybe test docs examples / curl examples if I add them
+- maybe manual Swagger check before final commit
+
+Keep tests in `app/tests/` for now 
+
 ## real SmolLM
 
 After the fake version works, swap in:
@@ -163,7 +189,7 @@ Needs:
 - curl examples
 - limitations / assumptions
 
-Keep it short but enough that someone can run it.
+ill try to keep it short
 
 ## reflektion projection injection
 
