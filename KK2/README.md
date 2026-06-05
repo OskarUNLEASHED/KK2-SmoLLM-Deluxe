@@ -9,7 +9,7 @@ O si estas aqui para copiar mi trabajo, no eres bienvenido D:
 
 
 
-## The Tiny Machine
+## Placeholder
 
 Esta es una API pequena para subir un dataset y hacer preguntas sobre el.
 
@@ -42,7 +42,7 @@ oraklet = PromptBuilder() | LLMRunner() | ResponseParser()
 
 
 
-## Starting The Ritual
+## How to get going
 
 Desde la carpeta `KK2`, instala todo:
 
@@ -74,7 +74,7 @@ Swagger es donde puedes probar la API si, como yo, no te gusta escribir curl a m
 
 
 
-## The Doors
+## Placeholder
 
 La API tiene estos endpoints:
 
@@ -150,7 +150,7 @@ Or if you are here to copy my work, you are not welcome D:
 
 
 
-## The Tiny Machine
+## Placeholder
 
 This is a small API for uploading a dataset and asking questions about it.
 
@@ -183,7 +183,7 @@ oraklet = PromptBuilder() | LLMRunner() | ResponseParser()
 
 
 
-## Starting The Ritual
+## How to boot
 
 From the `KK2` folder, install everything:
 
@@ -215,7 +215,7 @@ Swagger is where you can test the API if, like me, you dislike writing curl by h
 
 
 
-## The Doors
+## Placeholder
 
 The API has these endpoints:
 
