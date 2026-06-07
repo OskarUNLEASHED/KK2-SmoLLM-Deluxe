@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from collections.abc import Callable
 from typing import Any
 
@@ -14,6 +16,7 @@ from app.schemas import (
 
 
 DEFAULT_MODEL_NAME = get_settings().model_name
+logger = logging.getLogger(__name__)
 
 TextGenerator = Callable[..., list[dict[str, Any]]]
 
@@ -97,23 +100,51 @@ class LLMRunner(Runnable[PromptBuilderOutput, LLMRunnerOutput]):
     def invoke(self, input_data: PromptBuilderOutput) -> LLMRunnerOutput:
         settings = get_settings()
         try:
-            output = self._get_generator()(
-                input_data.prompt,
-                max_new_tokens=settings.max_new_tokens,
-                do_sample=settings.do_sample,
-                repetition_penalty=settings.repetition_penalty,
-                no_repeat_ngram_size=settings.no_repeat_ngram_size,
-                clean_up_tokenization_spaces=False,
-                return_full_text=False,
+            output = self._generate_with_timeout(
+                prompt=input_data.prompt,
+                timeout_seconds=settings.model_timeout_seconds,
+                generation_kwargs={
+                    "max_new_tokens": settings.max_new_tokens,
+                    "do_sample": settings.do_sample,
+                    "repetition_penalty": settings.repetition_penalty,
+                    "no_repeat_ngram_size": settings.no_repeat_ngram_size,
+                    "clean_up_tokenization_spaces": False,
+                    "return_full_text": False,
+                },
             )
+        except RuntimeError as exc:
+            logger.error("SmolLM generation failed: %s", exc)
+            raise
         except Exception as exc:
+            logger.error("SmolLM generation failed: %s", exc)
             raise RuntimeError("SmolLM could not generate an answer.") from exc
 
         raw_text = self._extract_generated_text(output)
         if not raw_text.strip():
+            logger.warning("SmolLM returned an empty answer.")
             raise ValueError("The model returned an empty answer.")
 
         return LLMRunnerOutput(raw_text=raw_text)
+
+    def _generate_with_timeout(
+        self,
+        prompt: str,
+        timeout_seconds: float,
+        generation_kwargs: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        generator = self._get_generator()
+        executor = ThreadPoolExecutor(max_workers=1)
+        future = executor.submit(generator, prompt, **generation_kwargs)
+
+        try:
+            return future.result(timeout=timeout_seconds)
+        except TimeoutError as exc:
+            future.cancel()
+            raise RuntimeError(
+                f"SmolLM took longer than {timeout_seconds:g} seconds to answer."
+            ) from exc
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
     def _get_generator(self) -> TextGenerator:
         if self._generator is None:

@@ -9,7 +9,7 @@ O si estas aqui para copiar mi trabajo, no eres bienvenido D:
 
 
 
-## Placeholder
+## Que hace
 
 Esta es una API pequena para subir un dataset y hacer preguntas sobre el.
 
@@ -74,7 +74,7 @@ Swagger es donde puedes probar la API si, como yo, no te gusta escribir curl a m
 
 
 
-## Placeholder
+## Endpoints
 
 La API tiene estos endpoints:
 
@@ -135,6 +135,14 @@ Los tests cubren los endpoints, la cadena Runnable, el comportamiento del modelo
 
 
 
+## Limits
+
+La app rechaza CSVs demasiado grandes antes de que Pandas los lea. El limite esta en `app/config.py`.
+
+La llamada al modelo tambien tiene timeout. Si SmolLM tarda demasiado o devuelve texto vacio, la API responde con error en vez de fingir que tiene una respuesta buena.
+
+
+
 ---
 
 
@@ -150,7 +158,7 @@ Or if you are here to copy my work, you are not welcome D:
 
 
 
-## Placeholder
+## What It Does
 
 This is a small API for uploading a dataset and asking questions about it.
 
@@ -215,7 +223,7 @@ Swagger is where you can test the API if, like me, you dislike writing curl by h
 
 
 
-## Placeholder
+## Endpoints
 
 The API has these endpoints:
 
@@ -273,3 +281,11 @@ uv run pytest app/tests/ -v
 ```
 
 The tests cover the endpoints, the Runnable chain, mocked model behavior, empty model answers, and a few bug fixes that appeared while building this.
+
+
+
+## Limits
+
+The app rejects oversized CSV files before Pandas reads them. The limit lives in `app/config.py`.
+
+The model call also has a timeout. If SmolLM is too slow or returns empty text, the API returns an error instead of pretending it has a good answer.

@@ -6,6 +6,7 @@ from typing import BinaryIO
 import pandas as pd
 from pandas import DataFrame
 
+from app.config import get_settings
 from app.schemas import UploadMetadata
 
 
@@ -22,6 +23,8 @@ store = DatasetStore()
 
 
 def load_csv(file: BinaryIO) -> UploadMetadata:
+    _validate_file_size(file)
+
     try:
         dataframe = pd.read_csv(file)
     except pd.errors.EmptyDataError as exc:
@@ -36,6 +39,32 @@ def load_csv(file: BinaryIO) -> UploadMetadata:
 
     store.dataframe = dataframe
     return metadata_for(dataframe)
+
+
+def _validate_file_size(file: BinaryIO) -> None:
+    current_position = file.tell()
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(current_position)
+
+    max_size = get_settings().max_upload_size_bytes
+    if size > max_size:
+        raise DatasetError(
+            f"The uploaded CSV file is too large. Max size is {_format_bytes(max_size)}."
+        )
+
+
+def _format_bytes(size: int) -> str:
+    if size < 1024:
+        return f"{size} bytes"
+
+    size_as_float = float(size)
+    for unit in ("KB", "MB", "GB"):
+        size_as_float /= 1024
+        if size_as_float < 1024:
+            return f"{size_as_float:.1f} {unit}"
+
+    return f"{size_as_float:.1f} TB"
 
 
 def metadata_for(dataframe: DataFrame) -> UploadMetadata:

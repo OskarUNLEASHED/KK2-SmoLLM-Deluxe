@@ -1,6 +1,9 @@
+import time
+
 from app.chain.direct_stats import answer_direct_stats_question
 from app.chain.pipeline import build_oraklet_chain
 from app.chain.steps import LLMRunner, PromptBuilder, ResponseParser
+from app.config import get_settings
 from app.schemas import LLMRunnerOutput, PromptBuilderInput, PromptBuilderOutput
 
 
@@ -43,6 +46,23 @@ def test_llm_runner_rejects_empty_model_output() -> None:
         assert str(exc) == "The model returned an empty answer."
     else:
         raise AssertionError("Expected ValueError for empty model output.")
+
+
+def test_llm_runner_rejects_slow_model_output(monkeypatch) -> None:
+    monkeypatch.setattr(get_settings(), "model_timeout_seconds", 0.01)
+
+    def slow_generator(*args: object, **kwargs: object) -> list[dict[str, str]]:
+        time.sleep(0.05)
+        return [{"generated_text": "Too late"}]
+
+    runner = LLMRunner(generator=slow_generator)
+
+    try:
+        runner.invoke(PromptBuilderOutput(prompt="Prompt text\nSvar:"))
+    except RuntimeError as exc:
+        assert "longer than 0.01 seconds" in str(exc)
+    else:
+        raise AssertionError("Expected RuntimeError for slow model output.")
 
 
 def test_response_parser_strips_prompt_echo() -> None:
