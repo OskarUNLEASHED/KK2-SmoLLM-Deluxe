@@ -15,11 +15,27 @@ dependencies = [
     "torch>=2.4.0",
 ]
 
+[project.scripts]
+ui = "start_ui:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["start_ui", "start_server"]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
 [dependency-groups]
 dev = [
     "pytest>=8.3.0",
     "httpx>=0.27.0",
 ]
+
+[tool.uv]
+package = true
 
 [tool.pytest.ini_options]
 testpaths = ["app/tests"]

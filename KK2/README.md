@@ -61,7 +61,7 @@ uv run uvicorn app.main:app --reload
 Si quieres abrir una ventana de escritorio simple:
 
 ```powershell
-uv run python start_ui.py
+uv run ui
 ```
 
 Tambien hay un archivo de atajo que pense que algunas personas podrian encontrar conveniente:
@@ -157,13 +157,7 @@ La llamada al modelo tambien tiene timeout. Si SmolLM tarda demasiado o devuelve
 
 # English Version
 
-If you cba to look and interpret data and also don't want to pay for expensive tokens.
-Then you've found the right place.
-
-Or if you are here to grade, hello Johan.
-
-Or if you are here to copy my work, you are not welcome D:
-
+This cat AI will read your .csv file and answer your burning questions!
 
 
 ## What It Does
@@ -216,7 +210,7 @@ uv run uvicorn app.main:app --reload
 If you want to open a simple desktop window:
 
 ```powershell
-uv run python start_ui.py
+uv run ui
 ```
 
 There is also a shortcut file that I thought some people might find convenient:
