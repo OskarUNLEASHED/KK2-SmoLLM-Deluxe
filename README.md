@@ -1,5 +1,9 @@
 # Cat Data Analyst Deluxe
 
+<p align="center">
+  <img src="images/Logo.png" alt="Cat Data Analyst Deluxe logo" width="120">
+</p>
+
 This cat AI will read your .csv file and answer your burning questions!
 
 
