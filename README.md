@@ -38,7 +38,7 @@ oraklet = PromptBuilder() | LLMRunner() | ResponseParser()
 
 ## How to boot
 
-From the `KK2` folder, install everything:
+From the repository root, install everything:
 
 ```powershell
 uv sync
